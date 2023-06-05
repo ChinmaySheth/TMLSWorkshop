@@ -1,0 +1,11 @@
+.message {
+    list-style-type: none;
+    padding: 5px;
+}
+
+.message-content {
+    border: 2px solid black;
+    border-radius: 5px;
+    text-align: left;
+    width: 50%;
+}
