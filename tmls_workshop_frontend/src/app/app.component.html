@@ -8,19 +8,22 @@
   </mat-grid-list> -->
 
   <div style="text-align: center; padding-top: 25px;">
-      <!-- <button mat-button color="primary">Primary</button> -->
-      <!-- <button mat-button color="primary" (click)="getProspectiveClientList()">Generate Client List</button> -->
       <button mat-button color="primary" (click)="refreshChat()">Refresh Chat</button>
-      <!-- <button mat-button color="primary" (click)="hideProspectiveClientList()">Hide Client List</button> -->
-      <!-- <p>{{prospectiveClientList | json}}</p> -->
       <div>
           <div>
               <h3>Messages in the conversation</h3>
               <div style="border: 2px solid black">
                   <div style="padding-top:25px;"></div>
-                  <li class="message" *ngFor="let message of messages">
-                      <div class="message-content">
+                  <li class="message" *ngFor="let message of messages; let i = index">
+                      <div *ngIf="i % 2 != 0" class="message-content" style="margin-left: auto; margin-right: 0;">
+                        <span>
                           <strong>{{message['user']}}</strong>: {{ message['message'] }}
+                        </span>
+                      </div>
+                      <div *ngIf="i % 2 == 0" class="message-content">
+                        <span>
+                          <strong>{{message['user']}}</strong>: {{ message['message'] }}
+                        </span>
                       </div>
                   </li>
                   <div style="padding-bottom:25px;"></div>
