@@ -20,7 +20,7 @@
                   <div style="padding-top:25px;"></div>
                   <li class="message" *ngFor="let message of messages">
                       <div class="message-content">
-                          {{message['user']}}: {{ message['message'] }}
+                          <strong>{{message['user']}}</strong>: {{ message['message'] }}
                       </div>
                   </li>
                   <div style="padding-bottom:25px;"></div>
@@ -47,6 +47,10 @@
                   <th mat-header-cell *matHeaderCellDef> Gender </th>
                   <td mat-cell *matCellDef="let element"> {{element.gender}} </td>
               </ng-container>
+              <ng-container matColumnDef="company_name">
+                <th mat-header-cell *matHeaderCellDef> Company </th>
+                <td mat-cell *matCellDef="let element"> {{element.company_name}} </td>
+            </ng-container>
               <ng-container matColumnDef="person_2">
                   <th mat-header-cell *matHeaderCellDef> Relationship With </th>
                   <td mat-cell *matCellDef="let element"> {{element.person_2}} </td>

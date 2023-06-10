@@ -1,0 +1,13 @@
+{
+  "schema": 1,
+  "description": "Determine the user's main intention",
+  "type": "completion",
+  "completion": {
+    "max_tokens": 10,
+    "temperature": 0.5,
+    "top_p": 0.0,
+    "presence_penalty":  0.0,
+    "frequency_penalty": 0.0,
+    "stop_sequences": []
+  }
+}

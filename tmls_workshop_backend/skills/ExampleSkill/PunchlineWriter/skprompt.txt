@@ -1,0 +1,2 @@
+Write a funny punchline for the following joke:
+```{{$input}}```

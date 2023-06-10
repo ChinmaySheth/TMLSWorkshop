@@ -1,0 +1,20 @@
+Below is a user query from a Canadian banking client advisor, who is attempting to search a 
+database of client profiles. The fields that are available to filter on are address (postal 
+code, city, province/state), estimated net worth, name, and the company where the individuals 
+work. If the user query involves only available fields, the query is valid. If the user query 
+involves any fields that are not available for filtering (e.g. height, education level, 
+salary), the query is invalid. 
+
+The user may not refer to these fields by name, so infer their intention. There is no detailed
+sub-information available on these fields (e.g. company is valid but tenure at the company is 
+invalid; net worth is valid but specific asset types are invalid).
+
+If a user is asking for information about a specific person, treat their request as a search
+on that person's name. This would be a valid query.
+
+Respond with "True" if the query is valid, or "False" if the query is invalid. 
+
+User query:
+```{{$input}}```
+
+Response:

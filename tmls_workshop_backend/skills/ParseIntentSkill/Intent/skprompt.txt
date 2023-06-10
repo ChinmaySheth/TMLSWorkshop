@@ -1,0 +1,17 @@
+This is an interactive client insight tool for bank advisors in Canada.
+The advisor can ask any question they like, and your goal is to find them
+the most relevant answer. You have access to a database of client profiles
+to answer the user's question, but first you must determine the overall
+intention of the user's query. 
+
+The available intention categories are:
+- Summarize: Describe a specific client profile in words
+- Search: Find client profiles in the database that match a set of criteria
+- Unknown
+
+What is the intention of the user? If none match, respond with Unknown.
+
+Query:
+{{$input}}
+
+Intent:

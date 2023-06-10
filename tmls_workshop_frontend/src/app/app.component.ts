@@ -1,9 +1,21 @@
 import { Component, ViewChild } from '@angular/core';
 import { MatPaginator } from '@angular/material/paginator';
-import { MatTableDataSource } from '@angular/material/table';
 import { BackendService } from './backend.service';
 import { FormControl } from '@angular/forms';
 
+export interface ClientProfile {
+  'name': string,
+  'age': string,
+  'company_name': string,
+  'gender': string,
+  'person_2': string,
+  'relationship': string,
+  'net_worth': string,
+  'postal_code': string,
+  'city': string,
+  'province': string,
+  'street': string
+}
 
 @Component({
   selector: 'app-root',
@@ -24,28 +36,16 @@ export class AppComponent {
     'postal_code',
     'city',
     'province',
-    'street'];
+    'street',
+    'company_name'];
   textInputForGPT = new FormControl('');
-  messages: Message[] = [{ user: "LLM", "message": "Hello, how may I help you?" }];
+  messages: Message[] = [{ user: "Client Service Advisor Bot", "message": "Hello, how may I help you?" }];
 
   constructor(backendService: BackendService) {
     this.backendService = backendService;
   }
 
   @ViewChild(MatPaginator, { static: true }) paginator: MatPaginator | any;
-
-
-  // getProspectiveClientList() {
-  //   if (this.textInputForGPT.value != null) {
-  //     if (this.textInputForGPT.value.trim().length > 0) {
-  //       this.backendService.getProspectiveClientList(this.textInputForGPT.value.trim()).subscribe(data => {
-  //         const data_processed = data["data"].slice(0, 5);
-  //         this.dataSource = data_processed;
-  //         this.dataSource.paginator = this.paginator;
-  //       })
-  //     }
-  //   }
-  // }
 
   refreshChat() {
     this.messages = [];
@@ -55,11 +55,15 @@ export class AppComponent {
     if (this.textInputForGPT.value) {
       this.messages.push({ "user": "You", "message": this.textInputForGPT.value.trim() })
       this.backendService.chat(this.textInputForGPT.value.trim()).subscribe(data => {
+        if (data["data"].length == 0) {
+          this.messages.push({"user":"Client Service Advisor Bot", "message": "No data found."})
+        } else {
 
-        const data_processed = data["data"]
-        this.dataSource = [data_processed];
+          const data_processed = data["data"]
+          this.dataSource = data_processed;
 
-        this.messages.push({ "user": "LLM", "message": "Updated the table with information about " + data_processed['name'] })
+          this.messages.push({ "user":"Client Service Advisor Bot", "message": "Updated the table below" })
+        }
       })
     }
 

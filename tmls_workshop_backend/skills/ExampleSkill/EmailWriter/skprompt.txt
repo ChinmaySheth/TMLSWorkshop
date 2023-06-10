@@ -1,0 +1,3 @@
+Draft an email from a local politician about {{$input}}. Address the email to 'Dear neighbours'. 
+Include links to relevant websites. If the topic above is not relevant to community updates or 
+events, write 'Irrelevant topic' instead of an email.

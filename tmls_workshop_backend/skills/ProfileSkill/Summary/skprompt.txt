@@ -1,0 +1,15 @@
+Below is a JSON object containing the profile of one or more clients that a banking advisor
+is interested in learning more about. For each individual, write a paragraph summarizing the 
+available information for the advisor. If any of the fields are empty, do not include them.
+
+Example:
+JSON:
+```[{"ID":514,"company_name":"Radio Canada","n_previous_jobs":3,"years_at_current_company":8.1698630137,"age":57,"gender":"Female","name":"Rachelle Derosiers","person_2":"Justin Derosiers","relationship":"Child","net_worth":545340.22,"postal_code":"G1V 2M2","city":"Quebec City","province":"QC","street":"17 Main St"}]```
+
+Summary:
+Rachelle Derosiers is a 57-year-old female and works at Radio Canada. She has worked there for 8.2 years, and had 3 previous jobs before her current position. Her estimated net worth is $545,340. She lives in Quebec City, QC at 17 Main Street (G1V 2M2). Justin Derosiers is known to be her child. 
+
+JSON:
+```{{$input}}```
+
+Summary:

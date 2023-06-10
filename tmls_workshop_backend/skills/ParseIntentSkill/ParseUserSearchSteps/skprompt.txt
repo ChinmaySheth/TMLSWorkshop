@@ -1,0 +1,32 @@
+Below is a user query from a Canadian banking advisor, who is attempting to search a database of client
+profiles. Their request needs to be broken down into a series of steps. The possible steps are:
+
+- filterLocation, parameters = {search_postal, search_city, search_province} (default values are empty string "")
+- filterNetWorth, parameters = {lower_limit, upper_limit} (default values are 0 and 1e12 respectively)
+- filterName, parameters = {search_name}
+- filterCompany, parameters = {search_company}
+
+What steps are needed to get the desired result for the user? Write the steps as a list of dictionaries. 
+Do not include steps that are not necessary. When a step has parameters that are not defined, use their 
+default values listed above.
+
+Examples:
+User query: 
+Find profiles for British Columbia residents with estimated net worth over $1 MM
+
+Steps:
+[{"step":"filterLocation", "params":{"search_postal":"", "search_city":"", "search_province":"BC"}}, 
+ {"step":"filterNetWorth", "params":{"lower_limit":1000000, "upper_limit":1e12}}
+]
+
+User query: 
+What information is available on Sarah O'Connor?
+
+Steps:
+[{"step":"filterName", "params":{"search_name":"Sarah O'Connor"}}
+]
+
+User query:
+```{{$input}}```
+
+Steps:
