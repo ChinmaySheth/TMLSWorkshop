@@ -17,6 +17,7 @@ class FilterSkill:
     @sk_function_context_parameter(name="upper_limit", description="Maximum net worth", default_value=1e12)
     def filterNetWorth(self, data: str, context: SKContext) -> str:
 
+        data = pd.read_json(data)
         # Find profiles where net worth is within range 
         data_filtered = data.loc[(data.net_worth >= context['lower_limit']) & (data.net_worth <= context['upper_limit'])]
         return data_filtered.to_json(orient='records')
@@ -29,7 +30,7 @@ class FilterSkill:
     @sk_function_context_parameter(name="search_name", description="Name to search for")
     def filterName(self, data: str, context: SKContext) -> str:
         
-
+        data = pd.read_json(data)
         # Find profiles where first and/or last name match search query 
         data_filtered = data.loc[data.name.str.contains(r"(^|\s|\-){}($|\s|\-)".format(context['search_name']), regex=True, case=False)]
         return data_filtered.to_json(orient='records')
@@ -42,6 +43,7 @@ class FilterSkill:
     @sk_function_context_parameter(name="search_company", description="Company to search for")
     def filterCompany(self, data: str, context: SKContext) -> str:
 
+        data = pd.read_json(data)
         # Find profiles where company name contains search term 
         data_filtered = data.loc[data.company_name.str.contains(context['search_company'], regex=True, case=False)]
         return data_filtered.to_json(orient='records')
@@ -56,7 +58,7 @@ class FilterSkill:
     @sk_function_context_parameter(name="search_province", description="Province to search for", default_value=None)
     def filterLocation(self, data: str, context: SKContext) -> str:
         
-        data_filtered = data
+        data_filtered = data = pd.read_json(data)
 
         # Applying whichever search filters apply
         # Up to the user to make sure search terms don't conflict if multiple are used
