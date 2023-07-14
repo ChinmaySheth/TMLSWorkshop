@@ -44,14 +44,13 @@ class TextInputForLLM(BaseModel):
 
 
 def validate_search_steps(steps_list):
+    "TODO: Validating the data type of a parameter, etc."
     valid_params_dict = {"filterLocation": {"search_postal": True, "search_city": True, "search_province": True},
                          "filterNetWorth": {"lower_limit": True, "upper_limit": True},
                          "filterName": {"search_name": True},
                          "filterCompany": {"search_company": True}
                         }
     for step in steps_list:
-        print(type(step))
-        print(step)
         if "step" not in step or step["step"] not in valid_params_dict or "params" not in step:
             return False
         
@@ -61,22 +60,6 @@ def validate_search_steps(steps_list):
 
     return True
 
-'''
-      "ID": 416,
-      "name": "Ava Wong",
-      "gender": "F",
-      "age": 51,
-      "company_name": "Jatis Solutions",
-      "years_at_current_company": "1.3315068493150686",
-      "n_previous_jobs": 1,
-      "net_worth": 6315971.917,
-      "postal_code": "T9K 0P9",
-      "city": "Fort McMurray",
-      "province": "AB",
-      "street": "120 Lombard St",
-      "person_2": "Hassan Wong",
-      "relationship": "Sibling"
-'''
 
 def validate_profiles(profiles):
     column_list = ["ID", "name", "gender", "age", "company_name", "years_at_current_company", "n_previous_jobs", "net_worth", "postal_code", "city", "province", "street", "person_2", "relationship"]
@@ -93,31 +76,38 @@ def generate_llm_response(textInputForGPT: TextInputForLLM):
     if kernel == None:
         start_kernel()
 
-    if data == None:
-        load_data()
-
+    #Validation skills
     skills = kernel.import_semantic_skill_from_directory("skills", "ParseIntentSkill")
     check_valid_search = skills["CheckValidSearch"]
-
+ 
     is_search_valid = check_valid_search(str(textInputForGPT.textInputForGPT))
 
     if not is_search_valid:
-        raise HTTPException(status_code=404, detail="Search query is not valid.")
-
-    # intent = skills["Intent"]
-    # capture_intent = intent(str(textInputForGPT.textInputForGPT))
+        response = create_response(str(textInputForGPT.textInputForGPT), False, False, [])
+        return {"data": [], "msg": response} 
+        #raise HTTPException(status_code=404, detail="Search query is not valid.")
 
     parse_user_search_steps = skills["ParseUserSearchSteps"]
     search_steps_list = parse_user_search_steps(str(textInputForGPT.textInputForGPT)).result
 
+    #Syntax check
     try:
         result = ast.literal_eval(search_steps_list)
     except:
-        raise HTTPException(status_code=404, detail="Search steps not valid.")
+        response = create_response(str(textInputForGPT.textInputForGPT), True, False, [])
+        return {"data": [], "msg": response} 
+        #raise HTTPException(status_code=404, detail="Search steps not valid.")
 
-    if not validate_search_steps(result):
-        raise HTTPException(status_code=404, detail="Search steps not valid.")
+    #Semantic check
+    are_search_steps_valid = validate_search_steps(result)
+
+    if not are_search_steps_valid:
+        response = create_response(str(textInputForGPT.textInputForGPT), True, False, [])
+        return {"data": [], "msg": response} 
+        #raise HTTPException(status_code=404, detail="Search steps not valid.")
     
+
+    #Native skill
     native_skill = kernel.import_native_skill_from_directory("skills", "FilterSkill")
     filter_location = native_skill["filterLocation"]
     filter_networth = native_skill["filterNetWorth"]
@@ -126,7 +116,10 @@ def generate_llm_response(textInputForGPT: TextInputForLLM):
     input="data/sample_data.json"
     output_profiles_list = []
 
+    #print(result) This is correct
+    #Execute the skills on the data
     for step_count, step in enumerate(result):
+        
         if step_count == 0:
             profiles_list = pd.read_json(input)
         else:
@@ -138,13 +131,13 @@ def generate_llm_response(textInputForGPT: TextInputForLLM):
                 "search_province": step["params"]["search_province"]
             })
 
-            result = filter_location(profiles_list, context_variables).result
+            result = filter_location(profiles_list, context_variables).result #Deterministic step
             try:
                 result_json = json.loads(result)
-                if validate_profiles(result_json):
-                    print(result_json)
-                    output_profiles_list += (result_json)
+                if validate_profiles(result_json): #Validate columns in dict
+                    output_profiles_list = (result_json)
             except:
+                #TODO: Add appropriate error handling
                 pass
 
         if step["step"] == "filterNetWorth":
@@ -156,7 +149,7 @@ def generate_llm_response(textInputForGPT: TextInputForLLM):
             try:
                 result_json = json.loads(result)
                 if validate_profiles(result_json):
-                    output_profiles_list += (result_json)
+                    output_profiles_list = (result_json)
             except:
                 pass
         if step["step"] == "filterName":
@@ -167,7 +160,7 @@ def generate_llm_response(textInputForGPT: TextInputForLLM):
             try:
                 result_json = json.loads(result)
                 if validate_profiles(result_json):
-                    output_profiles_list += (result_json)
+                    output_profiles_list = (result_json)
             except:
                 pass
         if step["step"] == "filterCompany":
@@ -178,11 +171,31 @@ def generate_llm_response(textInputForGPT: TextInputForLLM):
             try:
                 result_json = json.loads(result)
                 if validate_profiles(result_json):
-                    output_profiles_list += (result_json)
+                    output_profiles_list = (result_json)
             except:
                 pass
 
-    return {"data": output_profiles_list}
+    ##Create response 
+    response = create_response(str(textInputForGPT.textInputForGPT), True, True, output_profiles_list)
+    #print(response)
+
+    return {"data": output_profiles_list, "msg": response}
+
+
+def create_response(original_query: str, valid_search: str, valid_response: str, data):
+    global kernel
+    context = kernel.create_new_context()
+    context["ask"] = original_query
+    skills = kernel.import_semantic_skill_from_directory("skills", "ResultSkill")
+    generate_response = skills["ResultResponse"]
+    input_str = """Original request: {}
+Valid request: {}
+Valid search: {}
+Rows returned: {}""".format(original_query, valid_response, valid_search, len(data))
+    context["response_context"] = input_str
+    response = generate_response(context=context)
+    return response.result
+
 
 def load_data():
     global data
